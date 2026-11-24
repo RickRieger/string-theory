@@ -163,37 +163,44 @@ else{
 }
 
 //-----titleCase-----
+// A letter starts a word if it comes first or right after a space.
 function titleCase(str){
   let newStr = ''
-  for (let i = 0; i < str.length; i++){
-  if(i === 0){
-      newStr += `${str[i].toUpperCase()}`
-      
-  }
-  else if(str[i] === ' '){
-      newStr += ` ${str[i+1].toUpperCase()}`
-      i += 1
-  }
-  else{
-      newStr += str[i].toLowerCase()
-  }
+  let startOfWord = true
+  for (const char of str){
+    if(char === ' '){
+      newStr += char
+      startOfWord = true
+    }
+    else if(startOfWord){
+      newStr += char.toUpperCase()
+      startOfWord = false
+    }
+    else{
+      newStr += char.toLowerCase()
+    }
   }
   return newStr
 }
 
 //-----camelCase-----
 
+// Drop the spaces; capitalize the first letter of every word except the first.
 function camelCase(str){
   let newStr = ''
-  for (let i = 0; i < str.length; i++){
-
-  if(str[i] === ' '){
-      newStr += `${str[i+1].toUpperCase()}`
-      i += 1
-  }
-  else{
-      newStr += str[i].toLowerCase()
-  }
+  let capitalizeNext = false
+  for (const char of str){
+    if(char === ' '){
+      // only after a word has started, so leading spaces don't capitalize the first word
+      capitalizeNext = newStr !== ''
+    }
+    else if(capitalizeNext){
+      newStr += char.toUpperCase()
+      capitalizeNext = false
+    }
+    else{
+      newStr += char.toLowerCase()
+    }
   }
   return newStr
 }
