@@ -2,229 +2,200 @@
  * YOUR CODE HERE *
  ******************/
 
- //-----xify-----
-function xify(str){
-let xStr = ''
-  for (const char of str){
-      xStr += 'x'
+// The rules: no string methods except .toUpperCase and .toLowerCase,
+// so every answer builds a new string one character at a time.
+
+//-----xify-----
+function xify(str) {
+  let xStr = '';
+  for (const char of str) {
+    xStr += 'x';
   }
-return xStr
+  return xStr;
 }
 
- //-----yellingChars-----
- function yellingChars(str){
+//-----yellingChars-----
+function yellingChars(str) {
   let newStr = '';
-  
-  for (const char of str){
-    newStr += `${char}!`
+  for (const char of str) {
+    newStr += `${char}!`;
   }
   return newStr;
 }
 
 //-----indexedChars-----
-function indexedChars(str){
-  let newStr = ''
-  let index = -1
-  for (const char of str){
-    index += 1 
-    newStr += index + char
+function indexedChars(str) {
+  let newStr = '';
+  let index = 0;
+  for (const char of str) {
+    newStr += `${index}${char}`;
+    index++;
   }
-  return newStr
+  return newStr;
 }
- 
-//-----numberedChars-----
 
-function numberedChars(str){
-  let newStr = ''
-  let index = 0
-  for (const char of str){
-    index += 1 
-    newStr += `(${index})` + char
+//-----numberedChars-----
+// numbers count from 1, indexes from 0
+function numberedChars(str) {
+  let newStr = '';
+  let number = 1;
+  for (const char of str) {
+    newStr += `(${number})${char}`;
+    number++;
   }
-  return newStr
+  return newStr;
 }
 
 //-----exclaim-----
-
-function exclaim(str){
-  newStr = ''
-  for (const char of str){
-    if(char === '?' || char === '.'){
-      newStr += '!'
-    }
-    else{
-      newStr += char
+function exclaim(str) {
+  let newStr = '';
+  for (const char of str) {
+    if (char === '?' || char === '.') {
+      newStr += '!';
+    } else {
+      newStr += char;
     }
   }
-  return newStr
+  return newStr;
 }
-
 
 //-----repeatIt-----
-function repeatIt(str, n){
-  newStr = ''
-  for (i=0;i<n;i++){
-  newStr += str 
+function repeatIt(str, n) {
+  let newStr = '';
+  for (let i = 0; i < n; i++) {
+    newStr += str;
   }
-  return newStr
-  }
+  return newStr;
+}
 
 //-----truncate-----
-function truncate(str){
-  let newStr = ''
-  if (str.length < 19){
-    return str
+// Cutting to 15 characters and adding '...' makes 18, so a string of 18 or
+// fewer characters wouldn't get any shorter: return it unchanged.
+function truncate(str) {
+  if (str.length <= 18) {
+    return str;
   }
-  else{
-    for (i=0;i<15;i++){
-    newStr += str[i]
+  let newStr = '';
+  for (let i = 0; i < 15; i++) {
+    newStr += str[i];
   }
-}
-newStr += '...'
-return newStr
-  
+  return newStr + '...';
 }
 
 //-----ciEmailify-----
-function ciEmailify(name){
-  let email = ''
-  let newChar = ''
-  for(const char of name){
-    if(char === ' '){
-      newChar = '.'
-      email += newChar
+// A dot goes between words, added only when the next word starts,
+// so extra spaces (leading, trailing or doubled) never turn into extra dots.
+function ciEmailify(name) {
+  let email = '';
+  let needDot = false;
+  for (const char of name) {
+    if (char === ' ') {
+      needDot = email !== '';
+    } else {
+      if (needDot) {
+        email += '.';
+        needDot = false;
+      }
+      email += char.toLowerCase();
     }
-    else{
-      newChar = char.toLowerCase();
-      email += newChar
-    }  
   }
-  return email += '@codeimmersives.com'
+  return email + '@codeimmersives.com';
 }
 
 //-----reverse-----
-function reverse(str){
-  let newStr = ''
-  
-  for (let i= (str.length - 1) ; i > (-1);i--){
-  newStr += str[i]
+// walk the indexes backwards, from the last one down to 0
+function reverse(str) {
+  let newStr = '';
+  for (let i = str.length - 1; i >= 0; i--) {
+    newStr += str[i];
   }
-  return newStr
+  return newStr;
 }
 
-
 //-----onlyVowels-----
-
-// function onlyVowels(str) {
-//   let vowelList = 'AEIOUaeiou'
-//   let newStr = '';
-  
-//    for(var i = 0; i < str.length ; i++)
-//     {
-//       if (vowelList.indexOf(str[i]) !== -1)
-//       {
-//           newStr += str[i];
-//       }
-//     }
-//     return newStr;
-//   }
-
-function onlyVowels(str){
-  let newStr = ''
-  for (const char of str){
-    if(char === 'A'||
-      char === 'a' ||
-      char === 'E' ||
-      char === 'e' ||
-      char === 'I' ||
-      char === 'i' ||
-      char === 'O' ||
-      char === 'o' ||
-      char === 'U' ||
-      char === 'u' ){
-          newStr += char
-      }
+// lowercase a copy of each letter so 'A' and 'a' need only one check
+function onlyVowels(str) {
+  let newStr = '';
+  for (const char of str) {
+    const lower = char.toLowerCase();
+    if (lower === 'a' || lower === 'e' || lower === 'i' || lower === 'o' || lower === 'u') {
+      newStr += char;
+    }
   }
-  return newStr
+  return newStr;
 }
 
 //-----crazyCase-----
-function crazyCase(str){
-  let newStr = ''
-  for (i = 0; i < str.length; i++){
-if(i % 2 === 0){
-  newStr += str[i].toLowerCase()
-}
-else{
-  newStr += str[i].toUpperCase()
-}
+// even indexes lowercase, odd indexes uppercase (spaces count)
+function crazyCase(str) {
+  let newStr = '';
+  for (let i = 0; i < str.length; i++) {
+    if (i % 2 === 0) {
+      newStr += str[i].toLowerCase();
+    } else {
+      newStr += str[i].toUpperCase();
+    }
   }
-  return newStr
+  return newStr;
 }
 
 //-----titleCase-----
-function titleCase(str){
-  let newStr = ''
-  for (i = 0; i < str.length; i++){
-  if(i === 0){
-      newStr += `${str[i].toUpperCase()}`
-      
+// A letter starts a word if it comes first or right after a space.
+function titleCase(str) {
+  let newStr = '';
+  let startOfWord = true;
+  for (const char of str) {
+    if (char === ' ') {
+      newStr += char;
+      startOfWord = true;
+    } else if (startOfWord) {
+      newStr += char.toUpperCase();
+      startOfWord = false;
+    } else {
+      newStr += char.toLowerCase();
+    }
   }
-  else if(str[i] === ' '){
-      newStr += ` ${str[i+1].toUpperCase()}`
-      i += 1
-  }
-  else{
-      newStr += str[i].toLowerCase()
-  }
-  }
-  return newStr
+  return newStr;
 }
 
 //-----camelCase-----
-
-function camelCase(str){
-  let newStr = ''
-  for (i = 0; i < str.length; i++){
-
-  if(str[i] === ' '){
-      newStr += `${str[i+1].toUpperCase()}`
-      i += 1
+// Drop the spaces; capitalize the first letter of every word except the first.
+function camelCase(str) {
+  let newStr = '';
+  let capitalizeNext = false;
+  for (const char of str) {
+    if (char === ' ') {
+      // only after a word has started, so leading spaces don't capitalize the first word
+      capitalizeNext = newStr !== '';
+    } else if (capitalizeNext) {
+      newStr += char.toUpperCase();
+      capitalizeNext = false;
+    } else {
+      newStr += char.toLowerCase();
+    }
   }
-  else{
-      newStr += str[i].toLowerCase()
-  }
-  }
-  return newStr
+  return newStr;
 }
 
 //-----crazyCase2ReturnOfCrazyCase-----
-
-function crazyCase2ReturnOfCrazyCase(str){
-  let newStr = "";
-  let charIndex = 0;
+// like crazyCase, but spaces are copied without counting as letters
+function crazyCase2ReturnOfCrazyCase(str) {
+  let newStr = '';
+  let letterCount = 0;
   for (const char of str) {
-      
-      if (char === " ") {
-          newStr += ' '
-          continue;
-      }
-
-      
-      if (charIndex % 2 === 0) {
-          newStr += char.toLowerCase();
+    if (char === ' ') {
+      newStr += char;
+    } else {
+      if (letterCount % 2 === 0) {
+        newStr += char.toLowerCase();
       } else {
-          newStr += char.toUpperCase();
+        newStr += char.toUpperCase();
       }
-      
-      charIndex += 1;
+      letterCount++;
+    }
   }
-  
-  return newStr 
+  return newStr;
 }
-
-
-
 
 
 
