@@ -1,6 +1,6 @@
 // Extra tests added during the 2026 cleanup (not part of the original assignment).
 // main.test.js is the instructor's and is unchanged.
-const { titleCase, camelCase } = require('./main.js');
+const { titleCase, camelCase, ciEmailify } = require('./main.js');
 
 describe('titleCase (extra spaces)', () => {
   it('handles a trailing space instead of crashing', () => {
@@ -31,5 +31,15 @@ describe('camelCase (extra spaces)', () => {
 
   it('keeps the first word lowercase after leading spaces', () => {
     expect(camelCase('  Hello world')).toBe('helloWorld');
+  });
+});
+
+describe('ciEmailify (extra spaces)', () => {
+  it('turns a double space into one dot', () => {
+    expect(ciEmailify('Mary  Smith')).toBe('mary.smith@codeimmersives.com');
+  });
+
+  it('ignores leading and trailing spaces', () => {
+    expect(ciEmailify(' colin jaffe ')).toBe('colin.jaffe@codeimmersives.com');
   });
 });

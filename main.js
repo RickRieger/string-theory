@@ -86,20 +86,24 @@ return newStr
 }
 
 //-----ciEmailify-----
+// A dot goes between words, added only when the next word starts,
+// so extra spaces (leading, trailing or doubled) never turn into extra dots.
 function ciEmailify(name){
   let email = ''
-  let newChar = ''
+  let needDot = false
   for(const char of name){
     if(char === ' '){
-      newChar = '.'
-      email += newChar
+      needDot = email !== ''
     }
     else{
-      newChar = char.toLowerCase();
-      email += newChar
-    }  
+      if(needDot){
+        email += '.'
+        needDot = false
+      }
+      email += char.toLowerCase()
+    }
   }
-  return email += '@codeimmersives.com'
+  return email + '@codeimmersives.com'
 }
 
 //-----reverse-----
