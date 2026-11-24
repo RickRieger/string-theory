@@ -1,5 +1,199 @@
 # String Theory
 
+[![Tests](https://github.com/RickRieger/string-theory/actions/workflows/tests.yml/badge.svg)](https://github.com/RickRieger/string-theory/actions/workflows/tests.yml)
+
+**No live site.** This exercise is a set of functions checked by Jest tests, not a web page. The badge above shows the latest test run on GitHub Actions; click it to see the results.
+
+I did this exercise at the **Code Immersives** bootcamp in New York City in **March 2021**. It was forked from the instructor's repo. My code is at the top of [`main.js`](main.js), above the "PLEASE DON'T TOUCH!" line. The instructor's original instructions are kept unchanged under [Original assignment](#original-assignment-from-the-instructor) below.
+
+## What it practices
+
+**String building.** The rule is no string methods except `.toUpperCase()` and `.toLowerCase()`: no `.slice`, `.repeat`, `.split` or `.trim`. So every function starts with an empty string and adds to it one character at a time inside a loop:
+
+```js
+function yellingChars(str) {
+  let newStr = '';
+  for (const char of str) {
+    newStr += `${char}!`;   // add the character AND an exclamation point
+  }
+  return newStr;
+}
+```
+
+The 15 functions build on that pattern:
+
+| Idea | Functions |
+| --- | --- |
+| Replace or add to each character | `xify`, `yellingChars`, `exclaim` |
+| Keep a counter alongside the loop | `indexedChars` (from 0), `numberedChars` (from 1) |
+| Loop by index instead of by character | `repeatIt`, `truncate`, `reverse` (backwards), `crazyCase` (even/odd) |
+| Keep only some characters | `onlyVowels` |
+| Remember something about the previous character | `titleCase`, `camelCase`, `ciEmailify`, `crazyCase2ReturnOfCrazyCase` |
+
+That last row is the tricky one. Whether a letter should be capitalized, or a dot added, depends on whether a space came before it. My fixes below were all in that row.
+
+## Run the tests
+
+```bash
+npm ci
+npm run test:ci   # runs once and exits (expected: Tests: 38 passed, 38 total)
+npm test          # the instructor's watch mode: re-runs on every save, press q to quit
+```
+
+## How it's checked
+
+- [`main.test.js`](main.test.js) is the instructor's original test file, unchanged (29 tests).
+- [`cleanup.test.js`](cleanup.test.js) has 9 tests I added in 2026 for spacing the original tests never tried: trailing, leading and double spaces.
+- **GitHub Actions** ([`.github/workflows/tests.yml`](.github/workflows/tests.yml)) runs both on Node 20 on every push and pull request. The badge at the top shows the result.
+
+## Cleanup log
+
+### 2026-11-24
+
+My commit message from March 7, 2021 was "that was easy", and all 29 of the instructor's tests did pass. Trying inputs the tests didn't cover turned up the problems below.
+
+**1. Undeclared variables were leaking out as globals**
+
+*Why:* `exclaim` and `repeatIt` wrote `newStr = ''` without `let`, and five loops used `for (i = 0; ...)` without declaring `i`. In plain (non-strict) JavaScript that doesn't cause an error. It silently creates a **global** variable that every function shares. After calling the functions, `globalThis.i` and `globalThis.newStr` existed. Added `let` to each one.
+
+Before:
+
+```js
+function repeatIt(str, n){
+  newStr = ''
+  for (i=0;i<n;i++){
+  newStr += str 
+  }
+  return newStr
+  }
+```
+
+After:
+
+```js
+function repeatIt(str, n) {
+  let newStr = '';
+  for (let i = 0; i < n; i++) {
+    newStr += str;
+  }
+  return newStr;
+}
+```
+
+**2. `titleCase` and `camelCase` crashed on a trailing space and mishandled double spaces**
+
+*Why:* when they hit a space, both functions reached ahead to `str[i + 1]`, capitalized it, and skipped over it with `i += 1`. That breaks two ways:
+
+- After a trailing space there's nothing ahead, so `str[i + 1]` is `undefined`. `titleCase('hello world ')` then threw `TypeError: Cannot read properties of undefined`.
+- With a double space, the "next character" is the second space. `'hello  world'` came out as `'Hello  world'` from `titleCase`, and `camelCase` left a space in.
+
+Now each function keeps a flag that remembers "a space just happened" and decides one letter at a time. It never needs to look ahead.
+
+Before:
+
+```js
+else if(str[i] === ' '){
+    newStr += ` ${str[i+1].toUpperCase()}`
+    i += 1
+}
+```
+
+After:
+
+```js
+function titleCase(str) {
+  let newStr = '';
+  let startOfWord = true;
+  for (const char of str) {
+    if (char === ' ') {
+      newStr += char;
+      startOfWord = true;
+    } else if (startOfWord) {
+      newStr += char.toUpperCase();
+      startOfWord = false;
+    } else {
+      newStr += char.toLowerCase();
+    }
+  }
+  return newStr;
+}
+```
+
+`camelCase` works the same way with a `capitalizeNext` flag. It only sets that flag once a word has started, so leading spaces don't capitalize the first word.
+
+**3. `ciEmailify` turned extra spaces into extra dots**
+
+*Why:* every space became a dot, so `'Mary  Smith'` gave `mary..smith@codeimmersives.com`, and `' colin jaffe '` gave `.colin.jaffe.@codeimmersives.com`. Neither is a valid address. The easy fix would be `.trim()`, but that's a string method the rules don't allow. Instead the dot is added only when the next word actually starts.
+
+Before:
+
+```js
+if(char === ' '){
+  newChar = '.'
+  email += newChar
+}
+```
+
+After:
+
+```js
+if (char === ' ') {
+  needDot = email !== '';
+} else {
+  if (needDot) {
+    email += '.';
+    needDot = false;
+  }
+  email += char.toLowerCase();
+}
+```
+
+**4. Tidied the code and removed drafts**
+
+*Why:* to make it easier to read without changing what it does. I ran the old and new versions on the same 320 calls and every result matched. The instructor's "don't touch" section is unchanged.
+
+- Removed `sandBox.js` (commented-out drafts of the same functions) and a commented-out `onlyVowels` that used `.indexOf`, a string method the rules don't allow.
+- `onlyVowels` now lowercases a copy of each letter, so it checks 5 vowels instead of 10:
+
+  ```js
+  // before: 10 checks
+  if(char === 'A'|| char === 'a' || char === 'E' || char === 'e' || /* ...6 more */)
+  // after: 5 checks
+  const lower = char.toLowerCase();
+  if (lower === 'a' || lower === 'e' || lower === 'i' || lower === 'o' || lower === 'u')
+  ```
+
+- `truncate` now says `str.length <= 18` (same as the old `< 19`), with the reason in a comment. Cutting to 15 characters and adding `...` makes 18, so anything that short wouldn't get any shorter.
+- Consistent indentation and semicolons, a one-line comment per function, and clearer names (`number` and `letterCount` instead of reusing `index`).
+
+**5. Updated Jest and added GitHub Actions**
+
+*Why:* the repo used Jest 24 from 2019. `npm audit` on its lock file reports **67 known vulnerabilities (11 critical)** in old sub-dependencies, which is why Dependabot had opened update branches. Jest 29 brings that to **0**. I also added `test:ci` (the instructor's `npm test` is watch mode and never exits) and the Actions workflow behind the badge.
+
+Before:
+
+```json
+"scripts": { "test": "jest --watch-all" },
+"devDependencies": { "jest": "^24.9.0" }
+```
+
+After:
+
+```json
+"scripts": { "test": "jest --watch-all", "test:ci": "jest --ci" },
+"devDependencies": { "jest": "29.7.0" }
+```
+
+**6. This README**
+
+*Why:* to explain the pattern, the fixes, and how to run the tests. The instructor's text below is unchanged.
+
+---
+
+## Original assignment (from the instructor)
+
+### String Theory
+
 ### Introduction
 
 Let's use string building!
