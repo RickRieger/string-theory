@@ -47,7 +47,7 @@ function numberedChars(str){
 //-----exclaim-----
 
 function exclaim(str){
-  newStr = ''
+  let newStr = ''
   for (const char of str){
     if(char === '?' || char === '.'){
       newStr += '!'
@@ -62,8 +62,8 @@ function exclaim(str){
 
 //-----repeatIt-----
 function repeatIt(str, n){
-  newStr = ''
-  for (i=0;i<n;i++){
+  let newStr = ''
+  for (let i = 0; i < n;i++){
   newStr += str 
   }
   return newStr
@@ -76,7 +76,7 @@ function truncate(str){
     return str
   }
   else{
-    for (i=0;i<15;i++){
+    for (let i = 0; i < 15;i++){
     newStr += str[i]
   }
 }
@@ -151,7 +151,7 @@ function onlyVowels(str){
 //-----crazyCase-----
 function crazyCase(str){
   let newStr = ''
-  for (i = 0; i < str.length; i++){
+  for (let i = 0; i < str.length; i++){
 if(i % 2 === 0){
   newStr += str[i].toLowerCase()
 }
@@ -165,7 +165,7 @@ else{
 //-----titleCase-----
 function titleCase(str){
   let newStr = ''
-  for (i = 0; i < str.length; i++){
+  for (let i = 0; i < str.length; i++){
   if(i === 0){
       newStr += `${str[i].toUpperCase()}`
       
@@ -185,7 +185,7 @@ function titleCase(str){
 
 function camelCase(str){
   let newStr = ''
-  for (i = 0; i < str.length; i++){
+  for (let i = 0; i < str.length; i++){
 
   if(str[i] === ' '){
       newStr += `${str[i+1].toUpperCase()}`
